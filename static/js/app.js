@@ -192,12 +192,29 @@ function startAudio() {
 // Start the audio only when the user clicked the button
 // (due to the gesture requirement for the Web Audio API)
 const startAudioButton = document.getElementById("startAudioButton");
+const stopAudioButton = document.getElementById("stopAudioButton");
+const recordingIndicator = document.querySelector(".recording-indicator");
+const buttonLabel = document.getElementById("button-label");
+
+stopAudioButton.disabled = true;
+
 startAudioButton.addEventListener("click", () => {
   startAudioButton.disabled = true;
+  stopAudioButton.disabled = false;
+  startAudioButton.classList.add("is-recording");
+  if (recordingIndicator) {
+    recordingIndicator.classList.add("is-recording");
+  }
+  buttonLabel.textContent = "Listening...";
   startAudio();
   is_audio = true;
   eventSource.close(); // close current connection
   connectSSE(); // reconnect with the audio mode
+});
+
+stopAudioButton.addEventListener("click", () => {
+  console.log('Stop Audio');
+  stopAudio();
 });
 
 // Audio recorder handler
@@ -253,6 +270,49 @@ function stopAudioRecording() {
   if (audioBuffer.length > 0) {
     sendBufferedAudio();
   }
+}
+
+// Stop audio
+function stopAudio() {
+  // Stop audio recording
+  stopAudioRecording();
+
+  // Stop the microphone stream tracks
+  if (micStream) {
+    micStream.getTracks().forEach((track) => {
+      track.stop();
+    });
+    micStream = null;
+  }
+
+  // Close the audio player and recorder contexts
+  if (audioPlayerContext) {
+    audioPlayerContext.close();
+    audioPlayerContext = null;
+    audioPlayerNode = null;
+  }
+  if (audioRecorderNode) {
+    audioRecorderNode.disconnect();
+    audioRecorderNode = null;
+  }
+  if (audioRecorderContext) {
+    audioRecorderContext.close();
+    audioRecorderContext = null;
+  }
+
+  // Disable the audio mode
+  is_audio = false;
+  eventSource.close();
+  connectSSE();
+
+  // Re-enable the start button and disable the stop button
+  startAudioButton.disabled = false;
+  stopAudioButton.disabled = true;
+  startAudioButton.classList.remove("is-recording");
+  if (recordingIndicator) {
+    recordingIndicator.classList.remove("is-recording");
+  }
+  buttonLabel.textContent = "Hold to Speak";
 }
 
 // Encode an array buffer with Base64

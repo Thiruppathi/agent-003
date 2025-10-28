@@ -1,23 +1,260 @@
 <!doctype html>
 <html>
-  <head>
-    <title>ADK Streaming Test (Audio)</title>
-    <script src="/static/js/app.js" type="module"></script>
-  </head>
+<style>
+  :root {
+    --primary-blue: #007aff;
+    --primary-red: #d93025;
+    --agent-bubble: #eef1f5;
+    --user-bubble: var(--primary-blue);
+    --background-color: #ffffff;
+    --text-dark: #1d1d1f;
+    --text-light: #ffffff;
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
 
-  <body>
-    <h1>ADK Streaming Test</h1>
-    <div
-      id="messages"
-      style="height: 300px; overflow-y: auto; border: 1px solid black"></div>
-    <br />
+  body {
+    font-family: var(--font-family);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--background-color);
+    color: var(--text-dark);
+  }
 
-    <form id="messageForm">
-      <label for="message">Message:</label>
-      <input type="text" id="message" name="message" />
-      <button type="submit" id="sendButton" disabled>Send</button>
-      <button type="button" id="startAudioButton">Start Audio</button>
-    </form>
-  </body>
+  .header {
+    text-align: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e5e5;
+    background: var(--background-color);
+  }
+
+  .header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  /* This is your original 'messages' div */
+  .chat-history {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .chat-bubble {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 75%;
+    padding: 0.75rem 1rem;
+    border-radius: 20px;
+    line-height: 1.5;
+  }
+
+  .chat-bubble p {
+    margin: 0;
+  }
+
+  .chat-bubble .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .chat-bubble.agent {
+    background-color: var(--agent-bubble);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+
+  .chat-bubble.user {
+    background-color: var(--user-bubble);
+    color: var(--text-light);
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+    /* User bubbles don't have an avatar in this design */
+  }
+
+  /* This is your original 'messageForm', now styled as a footer.
+        It's set to display: flex to center the main button.
+      */
+  .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    border-top: 1px solid #e5e5e5;
+    background: #f9f9f9;
+  }
+
+  /* We HIDE the original text-based inputs.
+        They still exist in the HTML, so app.js won't crash if it tries to find them.
+      */
+  #message,
+  #sendButton {
+    display: none;
+  }
+
+  /* This is your original 'startAudioButton', now restyled as
+        the primary voice button.
+      */
+  .record-button {
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    /* Pill shape */
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+  }
+
+  .stop-button {
+    background-color: var(--primary-red);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    /* Pill shape */
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    margin-left: 50px;
+  }
+
+  .record-button:hover {
+    background-color: #0056b3;
+  }
+
+  /* This class can be toggled by your app.js to show a recording state */
+  .record-button.is-recording {
+    background-color: green;
+    /* Red for recording */
+  }
+
+    .record-button.is-recording .mic-icon {
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.4);
+      opacity: 0.7;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  .record-button:active {
+    transform: scale(0.95);
+  }
+
+  .record-button svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+
+  .stop-button:disabled {
+    background-color: #f8d7da;
+    color: #721c24;
+    cursor: not-allowed;
+  }
+
+  .recording-indicator {
+    display: none; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .recording-indicator.is-recording {
+    display: flex;
+  }
+
+  .recording-indicator .mic-icon {
+    animation: pulse 1.5s infinite;
+  }
+</style>
+
+<head>
+  <title>ADK Streaming Test (Audio)</title>
+  <script src="/static/js/app.js" type="module"></script>
+  
+  <!-- Google Font for a clean, friendly look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  
+</head>
+   
+<body>
+   <div class="header">
+      <h1>Good Agent.AI</h1>
+    </div>
+
+    <!-- 
+      This is your original 'messages' div, now with a 'chat-history' class.
+      I've added placeholder content so you can see the styling.
+      Your app.js will presumably add real messages here.
+    -->
+    <div id="messages" class="chat-history">
+      <div class="chat-bubble agent">
+        <img src="https://placehold.co/40x40/E8F5E9/4CAF50?text=B" alt="Agent" class="avatar">
+        <p>Good morning, Jane! This is Brian, just checking in. How are you feeling today?</p>
+      </div>
+      <div class="chat-bubble user">
+        <p>I'm okay, just a bit dizzy.</p>
+      </div>
+      <div class="chat-bubble agent">
+        <img src="https://placehold.co/40x40/E8F5E9/4CAF50?text=B" alt="Agent" class="avatar">
+        <p>I'm sorry to hear that. Please be careful. I'll make a note of it. Is there anything else on your mind?</p>
+      </div>
+      <div class="recording-indicator">
+        <span class="mic-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24px" height="24px">
+            <path d="M12 14a2 2 0 0 1-2-2V6a2 2 0 0 1 4 0v6a2 2 0 0 1-2 2z"></path>
+            <path d="M12 17a5 5 0 0 0 5-5V6a5 5 0 0 0-10 0v6a5 5 0 0 0 5 5z"></path>
+            <path d="M19 12v1a7 7 0 0 1-14 0v-1h2v1a5 5 0 0 0 10 0v-1z"></path>
+          </svg>
+        </span>
+      </div>
+    </div>
+  <form id="messageForm" class="footer">
+    <label for="message" style="display: none;">Message:</label>
+    <button type="button" id="startAudioButton" class="record-button">
+      <!-- Mic icon -->
+       <span class="mic-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 14a2 2 0 0 1-2-2V6a2 2 0 0 1 4 0v6a2 2 0 0 1-2 2z"></path>
+        <path d="M12 17a5 5 0 0 0 5-5V6a5 5 0 0 0-10 0v6a5 5 0 0 0 5 5z"></path>
+        <path d="M19 12v1a7 7 0 0 1-14 0v-1h2v1a5 5 0 0 0 10 0v-1z"></path>
+      </svg>
+      </span>
+      <!-- Your app.js can change this text based on state -->
+      <span id="button-label">Hold to Speak</span>
+    </button>
+    <button type="button" id="stopAudioButton" class="stop-button">Stop Audio</button>
+  </form>
+</body>
 
 </html>
