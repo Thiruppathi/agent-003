@@ -28,6 +28,13 @@ The Problem:
 - **Emergency Support**: Can contact emergency services or emergency contacts
 - **Web Interface**: Modern, accessible UI for easy interaction
 
+## Future Extensions (Powered by Gemini):
+
+* Proactive Health Monitoring: Gemini can analyze conversation trends over weeks. (e.g., "Brian, I've noticed you've mentioned being 'dizzy' three times this week. I can schedule a telehealth check-in for you.")
+
+* Daily Caregiver Summaries: Provides a daily "peace of mind" summary for the caregiver. (e.g., "Jane seemed in good spirits today. No concerns detected.")
+
+* Vision-Enabled Fall Detection: Using the device's camera, the agent can visually detect a fall and escalate immediately, even if the user is unable to speak.
 
 ## Prerequisites
 
