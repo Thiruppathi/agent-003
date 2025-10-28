@@ -68,7 +68,8 @@ async def start_agent_session(user_id, is_audio=False):
     )
 
     # Set response modality
-    modality = "AUDIO" if is_audio else "TEXT"
+    # Note: Gemini Live model only supports AUDIO modality
+    modality = "AUDIO"
     run_config = RunConfig(
         response_modalities=[modality],
         session_resumption=types.SessionResumptionConfig()
