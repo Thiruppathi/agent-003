@@ -47,7 +47,8 @@ cd agent-003
 
 2. **Install dependencies**
 ```bash
-pip install -e .
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv venv && source .venv/bin/activate && uv sync
 ```
 
 3. **Create `.env` file** (for local development):
