@@ -1,4 +1,4 @@
-# Elderly Care Agent
+# Good Agent.AI
 
 AI-powered elderly care agent with voice support built with Google Agent Development Kit (ADK) and Vertex AI.
 
@@ -8,16 +8,26 @@ AI-powered elderly care agent with voice support built with Google Agent Develop
 
 ## Overview
 
-This is Brian, a conversational AI caretaker designed to provide care, supervision, and assistance to elderly people living alone. The agent supports both text and audio interactions, leveraging Google's Gemini Live model for natural conversations.
+Millions of elderly people live alone, and caregivers are overwhelmed. "Good Agent.AI" is a proactive, voice-first AI caretaker, "Brian," who provides daily companionship and intelligent safety monitoring, only alerting caregivers when help is actually needed.
 
-## Features
+The Problem:
 
+* For Seniors: High risk of falls, missed medication, and profound loneliness.
+* For Caregivers: Constant stress, "alert fatigue," and the burden of repetitive check-ins.
+
+## Core Features (Powered by Gemini & Genkit):
+
+* Proactive Voice Check-ins: Brian initiates natural, human-like conversations.
+* Intelligent Risk Assessment: Gemini's logic understands the *intent and urgency* behind a user's words (e.g., "I've fallen!" vs. "I fell asleep").
+* Autonomous Escalation: The agent *acts* on high-risk events, autonomously sending real-time SMS alerts to caregivers.
+* Personal Memory & Companionship: The agent remembers key details (names, past events) to build genuine rapport and combat loneliness.
 - **Voice Support**: Real-time audio streaming with Gemini Live
 - **Text Chat**: Traditional text-based interactions
 - **Health Monitoring**: Tracks beneficiary state and provides assistance
 - **Calendar Integration**: Reminds users of their daily plans
 - **Emergency Support**: Can contact emergency services or emergency contacts
 - **Web Interface**: Modern, accessible UI for easy interaction
+
 
 ## Prerequisites
 
