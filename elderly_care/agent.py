@@ -1,4 +1,8 @@
+from time import sleep
 from google.adk.agents.llm_agent import Agent
+from google.adk.sessions import InMemorySessionService, Session
+from google.adk.memory import InMemoryMemoryService
+from google.adk.tools.preload_memory_tool import PreloadMemoryTool
 
 SYSTEMINSTRUCTION="""
 
@@ -49,10 +53,24 @@ Remember that your ultimate goal is to create a supportive environment for your
 clients to thrive.
 """
 
+session_service = InMemorySessionService()
+memory_service = InMemoryMemoryService()
+
+async def auto_save_session_to_memory_callback(callback_context):
+    await callback_context._invocation_context.memory_service.add_session_to_memory(
+        callback_context._invocation_context.session)
+
+
+def emergency_contact_call(contact_nr: str) -> str:
+    print(f'📞 Calling {contact_nr}...')
+    sleep(5)
+    return 'OK'
 
 root_agent = Agent(
     model='gemini-live-2.5-flash-preview-native-audio-09-2025',
     name='root_agent',
     description='An elderly care agent to support older people living alone',
     instruction=SYSTEMINSTRUCTION,
+    tools=[emergency_contact_call, PreloadMemoryTool()],
+    after_agent_callback=auto_save_session_to_memory_callback
 )

@@ -26,7 +26,7 @@ from google.genai.types import (
     Blob,
 )
 
-from google.adk.runners import InMemoryRunner
+from google.adk.runners import Runner
 from google.adk.agents import LiveRequestQueue
 from google.adk.agents.run_config import RunConfig
 from google.genai import types
@@ -36,7 +36,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from elderly_care.agent import root_agent
+from elderly_care.agent import root_agent, memory_service, session_service
 
 warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
 
@@ -54,9 +54,11 @@ async def start_agent_session(user_id, is_audio=False):
     """Starts an agent session"""
 
     # Create a Runner
-    runner = InMemoryRunner(
+    runner = Runner(
         app_name=APP_NAME,
         agent=root_agent,
+        session_service=session_service,
+        memory_service=memory_service 
     )
 
     # Create a Session
