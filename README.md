@@ -4,6 +4,8 @@ AI-powered elderly care agent with voice support built with Google Agent Develop
 
 **AI Agents Live + Labs - Benelux Hackathon**
 
+**Live Demo:** [https://elderly-care-agent-cwgynx23zq-ew.a.run.app/](https://elderly-care-agent-cwgynx23zq-ew.a.run.app/)
+
 ## Overview
 
 This is Brian, a conversational AI caretaker designed to provide care, supervision, and assistance to elderly people living alone. The agent supports both text and audio interactions, leveraging Google's Gemini Live model for natural conversations.
@@ -110,7 +112,9 @@ gcloud run deploy elderly-care-agent \
 
 ## Using the Deployed Agent
 
-After deployment, you'll receive a service URL like:
+The agent is currently deployed at: **[https://elderly-care-agent-cwgynx23zq-ew.a.run.app/](https://elderly-care-agent-cwgynx23zq-ew.a.run.app/)**
+
+After deploying your own instance, you'll receive a service URL like:
 ```
 https://elderly-care-agent-XXXXXXXXXX.europe-west1.run.app
 ```
